@@ -444,6 +444,7 @@
               <div class="time-row"><div class="time">13:00</div><div><h4>Arianna al Borghetto</h4><p>Roman comfort food a few steps from the archaeological site.</p></div></div>
               <div class="time-row"><div class="time">15:00</div><div><h4>Julius II Castle + Ostia Antica hamlet</h4><p>The hamlet appeared as fictional Solitano, Marcello Muratori's home town, in <em>Emily in Paris</em>. Then continue to the Sacred Island, the Roman ships and the imperial ports.</p></div></div>
               <div class="time-row"><div class="time">19:00</div><div><h4>Zenzero Biorestaurant</h4><p>Organic, locally sourced cooking in the Park of the Pond Channel.</p></div></div>
+              <div class="time-row"><div class="time">21:30</div><div><h4>Return to EUR Fermi</h4><p>Take the Metro Mare and Metro B back to the original meeting point with your guide.</p></div></div>
               <div class="timeline-note"><strong>Summer edition:</strong> from 21–30 August, swap the afternoon choice for the Sagra della Tellina at the Fishermen's District, with seafood tasting and the Stella Maris procession.</div>
             </div>
           </div>
@@ -512,14 +513,15 @@
       {day: 2, time: '16:30', name: 'Portus Necropolis · Isola Sacra', place: 'Sacred Island', coords: [41.7699, 12.2726], query: 'Necropolis of Portus Isola Sacra'},
       {day: 2, time: '17:00', name: 'Museum of the Roman Ships', place: 'Fiumicino', coords: [41.7727, 12.2791], query: 'Museum of the Roman Ships Fiumicino'},
       {day: 2, time: '17:30', name: 'Imperial Harbours of Claudius & Trajan', place: 'Porti Imperiali', coords: [41.7734, 12.2780], query: 'Imperial Harbours of Claudius and Trajan'},
-      {day: 2, time: '19:00', name: 'Zenzero Biorestaurant', place: 'Via Mar dei Sargassi, 68', coords: [41.7233, 12.2965], query: 'Zenzero Biorestaurant Via Mar dei Sargassi 68'}
+      {day: 2, time: '19:00', name: 'Zenzero Biorestaurant', place: 'Via Mar dei Sargassi, 68', coords: [41.7233, 12.2965], query: 'Zenzero Biorestaurant Via Mar dei Sargassi 68'},
+      {day: 2, time: '21:30', name: 'Return to EUR Fermi Metro Station', place: 'End point · Metro Mare + Metro B', coords: [41.8314, 12.4692], query: 'EUR Fermi Metro Station Rome'}
     ];
     let activeFilter = 'all';
     let map;
     let markerLayer;
     const markers = new Map();
     const route1 = [[41.8314,12.4692],[41.7422,12.3662],[41.7387,12.3044],[41.7335,12.3109],[41.7348,12.2980],[41.7289,12.3127],[41.7587,12.3016],[41.7674,12.3058]];
-    const route2 = [[41.7674,12.3058],[41.7567,12.2968],[41.7562,12.2962],[41.7560,12.2966],[41.7699,12.2726],[41.7727,12.2791],[41.7734,12.2780],[41.7233,12.2965]];
+    const route2 = [[41.7674,12.3058],[41.7567,12.2968],[41.7562,12.2962],[41.7560,12.2966],[41.7699,12.2726],[41.7727,12.2791],[41.7734,12.2780],[41.7233,12.2965],[41.8314,12.4692]];
     const listEl = document.getElementById('stopList');
 
     function googleLink(query) { return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query); }
