@@ -101,7 +101,7 @@
       background:
         linear-gradient(90deg, rgba(12, 42, 34, .93) 0%, rgba(15, 53, 42, .78) 45%, rgba(15, 53, 42, .22) 100%),
         linear-gradient(180deg, rgba(8, 28, 23, .18), rgba(8, 28, 23, .7)),
-        url('https://images.unsplash.com/photo-1473445361085-b9a07f55608b?auto=format&fit=crop&w=2200&q=85') center/cover;
+        url('https://images.unsplash.com/photo-1758609555076-f77760673825?auto=format&fit=crop&w=2200&q=85') center/cover;
     }
     .hero::after { content: ''; position: absolute; inset: auto 0 0; height: 120px; background: linear-gradient(transparent, var(--cream)); opacity: .5; pointer-events: none; }
     .hero-inner { position: relative; z-index: 1; padding: 120px 0 90px; }
@@ -133,6 +133,31 @@
     .section.tight { padding-top: 78px; }
     .section-head { max-width: 690px; }
     .section-head p { color: var(--muted); font-size: 1.06rem; }
+
+    /* Sustainability / SDGs */
+    .sdg-band { padding: 105px 0; background: #edf3e9; border-top: 1px solid rgba(23,60,50,.06); border-bottom: 1px solid rgba(23,60,50,.06); }
+    .sdg-lead { display: grid; grid-template-columns: .86fr 1.14fr; gap: 70px; align-items: end; }
+    .sdg-lead p { color: var(--muted); max-width: 560px; }
+    .sdg-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; margin-top: 40px; }
+    .sdg-card { padding: 10px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; transition: transform .2s ease, box-shadow .2s ease; }
+    .sdg-card:hover { transform: translateY(-4px); box-shadow: 0 12px 25px rgba(23,60,50,.12); }
+    .sdg-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
+    .sdg-card strong { display: block; margin-top: 8px; color: var(--pine); font-size: .76rem; }
+    .sdg-card span { display: block; color: var(--muted); font-size: .67rem; line-height: 1.25; margin-top: 2px; }
+    .sdg-source { display: block; margin-top: 18px; color: var(--muted); font-size: .73rem; }
+    .sdg-source a { text-decoration: underline; text-underline-offset: 3px; }
+
+    /* Accessibility */
+    .access-section { padding: 105px 0; background: var(--paper); }
+    .access-lead { display: flex; justify-content: space-between; gap: 35px; align-items: end; }
+    .access-lead p { color: var(--muted); max-width: 540px; margin-bottom: 0; }
+    .access-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 38px; }
+    .access-card { padding: 25px; background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius-md); }
+    .access-icon { display: grid; place-items: center; width: 38px; height: 38px; margin-bottom: 17px; border-radius: 12px; background: var(--sage); color: var(--pine); }
+    .access-icon svg { width: 20px; height: 20px; }
+    .access-card h3 { font-family: 'DM Sans', sans-serif; font-size: 1.05rem; margin-bottom: 8px; }
+    .access-card p { color: var(--muted); font-size: .86rem; margin-bottom: 0; }
+    .access-note { margin-top: 25px; padding: 15px 18px; border-left: 3px solid var(--sun); color: var(--pine); background: #fbf6e8; font-size: .83rem; }
 
     /* Days */
     .day-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; margin-top: 42px; }
@@ -250,7 +275,11 @@
       .hero { min-height: 700px; }
       .hero-card { position: static; margin-top: 40px; width: fit-content; }
       .hero-note { margin-top: 34px; }
-      .split, .map-layout, .price-layout { grid-template-columns: 1fr; gap: 38px; }
+      .split, .map-layout, .price-layout, .sdg-lead { grid-template-columns: 1fr; gap: 38px; }
+      .access-lead { display: block; }
+      .access-lead p { margin-top: 15px; }
+      .sdg-grid { grid-template-columns: repeat(4, 1fr); }
+      .access-grid { grid-template-columns: 1fr; }
       .map-copy { padding: 0; }
       #map, .map-fallback { min-height: 460px; }
       .timeline { gap: 35px; }
@@ -268,6 +297,7 @@
       .fact:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
       .section { padding: 80px 0; }
       .day-grid, .timeline, .pillars { grid-template-columns: 1fr; }
+      .sdg-grid { grid-template-columns: repeat(2, 1fr); }
       .day-card { min-height: 390px; }
       .timeline-wrap { padding: 55px 21px; }
       .time-row { grid-template-columns: 62px 1fr; gap: 14px; }
@@ -294,6 +324,8 @@
       <nav class="nav-links" aria-label="Main navigation">
         <a href="#experience">The experience</a>
         <a href="#itinerary">Itinerary</a>
+        <a href="#sustainability">SDGs</a>
+        <a href="#accessibility">Access</a>
         <a href="#map-section">Map</a>
         <a href="#price">Price</a>
       </nav>
@@ -336,6 +368,25 @@
       </div>
     </section>
 
+    <section class="sdg-band" id="sustainability">
+      <div class="wrap">
+        <div class="sdg-lead">
+          <div><div class="eyebrow">Travel with purpose</div><h2>Small choices.<br>Shared goals.</h2></div>
+          <div><p>Ostia Unplugged connects local livelihoods, public transport, nature stewardship and inclusive access. That makes the weekend a practical, human-scale contribution to the UN 2030 Agenda.</p></div>
+        </div>
+        <div class="sdg-grid" aria-label="Sustainable Development Goals supported by this itinerary">
+          <a class="sdg-card" href="https://sdgs.un.org/goals/goal3" target="_blank" rel="noreferrer"><img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-03.jpg" alt="United Nations Sustainable Development Goal 3: Good Health and Well-being"><strong>SDG 03</strong><span>Good health &amp; well-being</span></a>
+          <a class="sdg-card" href="https://sdgs.un.org/goals/goal8" target="_blank" rel="noreferrer"><img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-08.jpg" alt="United Nations Sustainable Development Goal 8: Decent Work and Economic Growth"><strong>SDG 08</strong><span>Decent work &amp; growth</span></a>
+          <a class="sdg-card" href="https://sdgs.un.org/goals/goal10" target="_blank" rel="noreferrer"><img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-10.jpg" alt="United Nations Sustainable Development Goal 10: Reduced Inequalities"><strong>SDG 10</strong><span>Reduced inequalities</span></a>
+          <a class="sdg-card" href="https://sdgs.un.org/goals/goal11" target="_blank" rel="noreferrer"><img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-11.jpg" alt="United Nations Sustainable Development Goal 11: Sustainable Cities and Communities"><strong>SDG 11</strong><span>Sustainable cities</span></a>
+          <a class="sdg-card" href="https://sdgs.un.org/goals/goal12" target="_blank" rel="noreferrer"><img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-12.jpg" alt="United Nations Sustainable Development Goal 12: Responsible Consumption and Production"><strong>SDG 12</strong><span>Responsible consumption</span></a>
+          <a class="sdg-card" href="https://sdgs.un.org/goals/goal13" target="_blank" rel="noreferrer"><img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-13.jpg" alt="United Nations Sustainable Development Goal 13: Climate Action"><strong>SDG 13</strong><span>Climate action</span></a>
+          <a class="sdg-card" href="https://sdgs.un.org/goals/goal15" target="_blank" rel="noreferrer"><img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-15.jpg" alt="United Nations Sustainable Development Goal 15: Life on Land"><strong>SDG 15</strong><span>Life on land</span></a>
+        </div>
+        <small class="sdg-source">Official UN Sustainable Development Goals icons · <a href="https://sdgs.un.org/" target="_blank" rel="noreferrer">sdgs.un.org</a></small>
+      </div>
+    </section>
+
     <section class="section" id="experience">
       <div class="wrap split">
         <div class="section-head">
@@ -353,7 +404,19 @@
       </div>
       <div class="wrap day-grid">
         <article class="day-card day1"><div class="day-card-content"><div class="day-label">Day 01 · Nature + art</div><h3>Green trails, good food, open air.</h3><p>Castel Porziano, the Pineta, Chigi Castle and a sunset by the Fishermen's Channel.</p><div class="mini-list"><span>Forest walk</span><span>Castle visit</span><span>Seafood option</span></div></div></article>
-        <article class="day-card day2"><div class="day-card-content"><div class="day-label">Day 02 · Rediscover history</div><h3>Ancient Ostia, still alive.</h3><p>Roman streets, the harbour system and an organic dinner in the Park of the Pond Channel.</p><div class="mini-list"><span>Archaeological park</span><span>Imperial harbours</span><span>Local dinner</span></div></div></article>
+        <article class="day-card day2"><div class="day-card-content"><div class="day-label">Day 02 · Rediscover history</div><h3>Ancient Ostia, still alive.</h3><p>Roman streets, the harbour system and the real-life setting for Solitano in <em>Emily in Paris</em>.</p><div class="mini-list"><span>Archaeological park</span><span>Imperial harbours</span><span>Local dinner</span></div></div></article>
+      </div>
+    </section>
+
+    <section class="access-section" id="accessibility">
+      <div class="wrap">
+        <div class="access-lead"><div><div class="eyebrow">Designed to include</div><h2>A route with more<br>ways in.</h2></div><p>Tell us what you need when you enquire. With advance notice, we coordinate the right guide, access points and pace so deaf, blind and low-vision travellers can enjoy the same story.</p></div>
+        <div class="access-grid">
+          <article class="access-card"><div class="access-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6.5h16M4 11.5h16M4 16.5h9"/><path d="M17 15v6M14 18h6"/></svg></div><h3>Deaf &amp; hard of hearing</h3><p>We can request LIS-supported guiding where available. Ostia Antica also offers LIS and International Sign videos with Italian and English subtitles.</p></article>
+          <article class="access-card"><div class="access-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.5"/><path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3"/></svg></div><h3>Blind &amp; low vision</h3><p>Tactile panels, touchable materials and guided routes are available at Ostia Antica. The forest ride can be arranged in tandem with a sighted pilot.</p></article>
+          <article class="access-card"><div class="access-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 20V8M5 8l7-4 7 4M9 20v-6h6v6M2.5 20h19"/></svg></div><h3>Mobility &amp; comfort</h3><p>The archaeological park has facilitated routes and an accessible museum ramp. We confirm surfaces, rest stops and transport details before the weekend.</p></article>
+        </div>
+        <div class="access-note"><strong>Advance notice matters:</strong> Castello Chigi and Ostia Antica arrangements depend on the route, staffing and the date. We confirm tactile or LIS support with the venue before taking payment.</div>
       </div>
     </section>
 
@@ -379,7 +442,7 @@
               <div class="time-row"><div class="time">10:00</div><div><h4>Breakfast at the hotel</h4><p>Take the bus to Romagnoli / Scavi Ostia Antica.</p></div></div>
               <div class="time-row"><div class="time">11:00</div><div><h4>Archaeological Park of Ostia Antica</h4><p>Forum, baths, horrea, Capitolium and museum · full ticket €18.</p></div></div>
               <div class="time-row"><div class="time">13:00</div><div><h4>Arianna al Borghetto</h4><p>Roman comfort food a few steps from the archaeological site.</p></div></div>
-              <div class="time-row"><div class="time">15:00</div><div><h4>Julius II Castle + Ostia Antica hamlet</h4><p>Then continue to the Sacred Island, the Roman ships and the imperial ports.</p></div></div>
+              <div class="time-row"><div class="time">15:00</div><div><h4>Julius II Castle + Ostia Antica hamlet</h4><p>The hamlet appeared as fictional Solitano, Marcello Muratori's home town, in <em>Emily in Paris</em>. Then continue to the Sacred Island, the Roman ships and the imperial ports.</p></div></div>
               <div class="time-row"><div class="time">19:00</div><div><h4>Zenzero Biorestaurant</h4><p>Organic, locally sourced cooking in the Park of the Pond Channel.</p></div></div>
               <div class="timeline-note"><strong>Summer edition:</strong> from 21–30 August, swap the afternoon choice for the Sagra della Tellina at the Fishermen's District, with seafood tasting and the Stella Maris procession.</div>
             </div>
@@ -429,7 +492,7 @@
     </section>
   </main>
 
-  <footer><div class="wrap footer-inner"><span>© 2026 Ostia Unplugged · A slow-travel concept for Lido di Ostia</span><span><a href="https://www.ostiaantica.beniculturali.it/en/opening-hours-tickets/" target="_blank" rel="noreferrer">Check official park information</a> · <a href="https://commons.wikimedia.org/wiki/File:Castelfusano_(Parco_urbano_Pineta_di_Castel_Fusano)_-_Rome,_Italy_2024-03-04.jpg" target="_blank" rel="noreferrer">Day 1 photo: Ryan Hodnett / Wikimedia Commons</a> · <a href="https://commons.wikimedia.org/wiki/File:Ostia_theater_exterior.jpg" target="_blank" rel="noreferrer">Day 2 photo: Wikimedia Commons</a> · <a href="#map-section">Open route map</a></span></div></footer>
+  <footer><div class="wrap footer-inner"><span>© 2026 Ostia Unplugged · A slow-travel concept for Lido di Ostia</span><span><a href="https://www.ostiaantica.beniculturali.it/en/opening-hours-tickets/" target="_blank" rel="noreferrer">Check official park information</a> · <a href="https://unsplash.com/photos/people-cycling-on-a-path-through-a-sunlit-forest-Zzt1gVi4MEY" target="_blank" rel="noreferrer">Hero photo: Sergej Karpow / Unsplash</a> · <a href="https://commons.wikimedia.org/wiki/File:Castelfusano_(Parco_urbano_Pineta_di_Castel_Fusano)_-_Rome,_Italy_2024-03-04.jpg" target="_blank" rel="noreferrer">Day 1 photo: Ryan Hodnett / Wikimedia Commons</a> · <a href="https://commons.wikimedia.org/wiki/File:Ostia_theater_exterior.jpg" target="_blank" rel="noreferrer">Day 2 photo: Wikimedia Commons</a> · <a href="#map-section">Open route map</a></span></div></footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script>
