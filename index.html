@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Ostia Unplugged — a slow, pet-friendly two-day escape from Rome through pine forest, Roman ruins and the coast.">
+  <title>Ostia Unplugged | A two-day slow travel escape</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <style>
+    :root {
+      --forest: #173c32;
+      --forest-deep: #0e2b25;
+      --pine: #2d6350;
+      --moss: #8ba77b;
+      --sage: #dfead8;
+      --cream: #f6f5ec;
+      --paper: #fffef9;
+      --sun: #e9bd69;
+      --coral: #df805d;
+      --ink: #18342d;
+      --muted: #6c7e75;
+      --line: #dbe5dc;
+      --shadow: 0 24px 70px rgba(21, 58, 45, .14);
+      --radius-lg: 30px;
+      --radius-md: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--cream);
+      font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+    img { max-width: 100%; display: block; }
+    .wrap { width: min(1180px, calc(100% - 40px)); margin-inline: auto; }
+    .eyebrow {
+      color: var(--pine);
+      letter-spacing: .16em;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .eyebrow.light { color: #b9d4be; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; line-height: 1.08; }
+    h2 { font-size: clamp(2.1rem, 5vw, 3.9rem); letter-spacing: -.03em; margin-bottom: 18px; }
+    h3 { font-size: 1.45rem; margin-bottom: 10px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 20px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn.primary { background: var(--sun); color: var(--forest-deep); box-shadow: 0 10px 28px rgba(233, 189, 105, .25); }
+    .btn.primary:hover { background: #f0c982; }
+    .btn.ghost { color: #fff; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); }
+    .btn.ghost:hover { background: rgba(255,255,255,.15); }
+    .btn.dark { background: var(--forest); color: #fff; }
+    .btn.text { padding: 0; background: none; color: var(--pine); border-radius: 0; }
+
+    /* Navigation */
+    .nav {
+      position: absolute;
+      z-index: 5;
+      inset: 0 0 auto;
+      padding: 24px 0;
+      color: #fff;
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 700; letter-spacing: -.02em; }
+    .brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--sun); color: var(--forest); }
+    .brand-mark svg { width: 20px; height: 20px; }
+    .nav-links { display: flex; align-items: center; gap: 26px; font-size: .9rem; color: rgba(255,255,255,.78); }
+    .nav-links a:hover { color: #fff; }
+    .nav .btn { padding: 10px 16px; font-size: .86rem; }
+
+    /* Hero */
+    .hero {
+      min-height: 760px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      background:
+        linear-gradient(90deg, rgba(12, 42, 34, .93) 0%, rgba(15, 53, 42, .78) 45%, rgba(15, 53, 42, .22) 100%),
+        linear-gradient(180deg, rgba(8, 28, 23, .18), rgba(8, 28, 23, .7)),
+        url('https://images.unsplash.com/photo-1473445361085-b9a07f55608b?auto=format&fit=crop&w=2200&q=85') center/cover;
+    }
+    .hero::after { content: ''; position: absolute; inset: auto 0 0; height: 120px; background: linear-gradient(transparent, var(--cream)); opacity: .5; pointer-events: none; }
+    .hero-inner { position: relative; z-index: 1; padding: 120px 0 90px; }
+    .hero-copy { width: min(690px, 100%); }
+    .hero h1 { font-size: clamp(3.6rem, 8.6vw, 7.4rem); letter-spacing: -.065em; margin: 18px 0 24px; }
+    .hero-lede { max-width: 560px; color: rgba(255,255,255,.86); font-size: clamp(1.05rem, 2vw, 1.28rem); }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+    .hero-note { display: flex; flex-wrap: wrap; align-items: center; gap: 17px; margin-top: 70px; color: rgba(255,255,255,.75); font-size: .88rem; }
+    .hero-note span { display: inline-flex; align-items: center; gap: 8px; }
+    .hero-note svg { width: 17px; height: 17px; color: var(--sun); }
+    .hero-card { position: absolute; right: 0; bottom: 105px; width: 245px; padding: 20px; border: 1px solid rgba(255,255,255,.23); border-radius: var(--radius-md); background: rgba(15, 57, 44, .66); backdrop-filter: blur(12px); }
+    .hero-card strong { display: block; font-size: 1.25rem; margin: 7px 0 5px; }
+    .hero-card small { color: rgba(255,255,255,.68); }
+    .leaf-stamp { position: absolute; right: 13%; top: 20%; opacity: .18; }
+    .leaf-stamp svg { width: 230px; height: 230px; }
+
+    /* Intro strip */
+    .facts { position: relative; z-index: 2; margin-top: -42px; }
+    .facts-grid { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--paper); border: 1px solid rgba(21, 60, 48, .08); border-radius: 20px; box-shadow: var(--shadow); }
+    .fact { padding: 24px 27px; border-right: 1px solid var(--line); }
+    .fact:last-child { border-right: 0; }
+    .fact-icon { color: var(--coral); margin-bottom: 9px; }
+    .fact-icon svg { width: 20px; height: 20px; }
+    .fact strong { display: block; font-size: .97rem; }
+    .fact span { display: block; color: var(--muted); font-size: .82rem; margin-top: 3px; }
+
+    /* Sections */
+    .section { padding: 120px 0; }
+    .section.tight { padding-top: 78px; }
+    .section-head { max-width: 690px; }
+    .section-head p { color: var(--muted); font-size: 1.06rem; }
+
+    /* Days */
+    .day-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; margin-top: 42px; }
+    .day-card { position: relative; min-height: 470px; overflow: hidden; padding: 28px; display: flex; flex-direction: column; justify-content: flex-end; border-radius: var(--radius-lg); color: #fff; }
+    .day-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 22%, rgba(8, 34, 27, .9) 100%); }
+    .day-card.day1 { background: url('https://commons.wikimedia.org/wiki/Special:FilePath/Castelfusano%20(Parco%20urbano%20Pineta%20di%20Castel%20Fusano)%20-%20Rome,%20Italy%202024-03-04.jpg?width=1600') center/cover; }
+    .day-card.day2 { background: url('https://upload.wikimedia.org/wikipedia/commons/3/39/Ostia_theater_exterior.jpg') center/cover; }
+    .day-card-content { position: relative; z-index: 1; }
+    .day-label { display: inline-block; color: var(--sun); font-weight: 700; font-size: .78rem; text-transform: uppercase; letter-spacing: .14em; }
+    .day-card h3 { font-size: 2.2rem; margin: 9px 0 12px; }
+    .day-card p { color: rgba(255,255,255,.8); max-width: 430px; margin-bottom: 20px; }
+    .mini-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .mini-list span { padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.18); font-size: .78rem; }
+
+    /* Value proposition */
+    .split { display: grid; grid-template-columns: .86fr 1.14fr; gap: 76px; align-items: center; }
+    .script-quote { margin: 32px 0 0; padding-left: 20px; border-left: 3px solid var(--sun); color: var(--pine); font-family: 'Playfair Display', Georgia, serif; font-size: 1.55rem; line-height: 1.25; }
+    .pillars { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .pillar { padding: 23px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-md); }
+    .pillar .num { color: var(--coral); font-size: .77rem; font-weight: 700; letter-spacing: .12em; }
+    .pillar h3 { font-family: 'DM Sans', sans-serif; font-size: 1.05rem; margin: 12px 0 6px; }
+    .pillar p { color: var(--muted); font-size: .87rem; margin: 0; }
+
+    /* Timeline */
+    .timeline-wrap { background: var(--forest); color: #fff; padding: 85px clamp(24px, 6vw, 82px); border-radius: var(--radius-lg); }
+    .timeline-wrap .section-head p { color: #b6c9be; }
+    .timeline { display: grid; grid-template-columns: repeat(2, 1fr); gap: 50px; margin-top: 46px; }
+    .timeline-day { position: relative; }
+    .timeline-day::before { content: ''; position: absolute; left: 45px; top: 28px; bottom: 19px; border-left: 1px dashed rgba(177, 213, 183, .4); }
+    .timeline-day h3 { margin: 0 0 22px 0; font-size: 1.75rem; color: var(--sun); }
+    .time-row { position: relative; display: grid; grid-template-columns: 74px 1fr; gap: 18px; padding: 0 0 25px; }
+    .time { position: relative; z-index: 1; width: 74px; height: 29px; display: grid; place-items: center; border-radius: 999px; background: var(--pine); color: #fff; font-size: .77rem; font-weight: 700; }
+    .time-row:last-child { padding-bottom: 0; }
+    .time-row h4 { margin: 2px 0 4px; font-size: 1rem; }
+    .time-row p { color: #b6c9be; font-size: .83rem; margin: 0; }
+    .timeline-note { margin-top: 35px; padding: 15px 18px; border: 1px solid rgba(233,189,105,.32); border-radius: 14px; color: #f4d697; font-size: .84rem; }
+
+    /* Map */
+    .map-layout { display: grid; grid-template-columns: .92fr 1.08fr; gap: 28px; margin-top: 42px; align-items: stretch; }
+    .map-copy { padding: 25px 0 15px; }
+    .map-copy p { color: var(--muted); }
+    .map-legend { display: flex; gap: 18px; flex-wrap: wrap; margin: 28px 0; color: var(--muted); font-size: .78rem; }
+    .legend-item { display: inline-flex; align-items: center; gap: 7px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .legend-dot.d1 { background: var(--coral); }
+    .legend-dot.d2 { background: var(--pine); }
+    .map-filters { display: flex; gap: 7px; flex-wrap: wrap; }
+    .filter { border: 1px solid var(--line); background: transparent; color: var(--pine); padding: 8px 14px; border-radius: 999px; cursor: pointer; font-size: .78rem; font-weight: 700; }
+    .filter.active, .filter:hover { background: var(--pine); border-color: var(--pine); color: #fff; }
+    .stop-list { margin: 30px 0 0; max-height: 325px; overflow: auto; padding-right: 8px; }
+    .stop-item { display: grid; grid-template-columns: 50px 1fr auto; gap: 10px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+    .stop-item:hover .stop-name { color: var(--coral); }
+    .stop-time { color: var(--coral); font-size: .73rem; font-weight: 700; }
+    .stop-name { font-size: .88rem; font-weight: 700; transition: color .2s; }
+    .stop-place { display: block; color: var(--muted); font-size: .73rem; font-weight: 400; }
+    .stop-item .arrow { color: var(--moss); font-size: 1.2rem; }
+    #map { min-height: 560px; border-radius: var(--radius-lg); overflow: hidden; background: #dfeadd; box-shadow: var(--shadow); }
+    .leaflet-container { font-family: 'DM Sans', sans-serif; }
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--forest); color: #fff; }
+    .leaflet-popup-content { margin: 13px 15px; font-size: .84rem; }
+    .popup-title { font-weight: 700; margin-bottom: 4px; }
+    .popup-meta { color: #b6c9be; font-size: .74rem; }
+    .popup-link { display: inline-block; color: var(--sun); margin-top: 8px; font-weight: 700; font-size: .75rem; }
+    .marker { width: 25px; height: 25px; display: grid; place-items: center; border: 3px solid #fff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 4px 12px rgba(0,0,0,.22); }
+    .marker span { width: 7px; height: 7px; border-radius: 50%; background: #fff; transform: rotate(45deg); }
+    .marker.d1 { background: var(--coral); }
+    .marker.d2 { background: var(--pine); }
+    .map-fallback { display: none; height: 100%; min-height: 560px; position: relative; overflow: hidden; background: #dfeadd; }
+    .map-fallback::before { content: ''; position: absolute; inset: 0; opacity: .5; background: repeating-linear-gradient(25deg, transparent 0 52px, rgba(85,130,104,.18) 53px 55px), repeating-linear-gradient(155deg, transparent 0 92px, rgba(85,130,104,.12) 93px 95px); }
+    .fallback-sea { position: absolute; right: 0; top: 0; bottom: 0; width: 25%; background: #b5d5d2; opacity: .65; }
+    .fallback-route { position: absolute; inset: 15% 20% 18% 15%; border: 3px dashed rgba(45,99,80,.52); border-radius: 48% 52% 45% 54%; transform: rotate(12deg); }
+    .fallback-pin { position: absolute; z-index: 1; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 7px rgba(0,0,0,.25); }
+    .fallback-pin.d1 { background: var(--coral); }
+    .fallback-pin.d2 { background: var(--pine); }
+    .fallback-label { position: absolute; z-index: 1; padding: 5px 7px; background: rgba(255,254,249,.9); border-radius: 5px; box-shadow: 0 3px 10px rgba(22,60,48,.12); font-size: .68rem; font-weight: 700; }
+    .map-note { display: block; margin-top: 15px; color: var(--muted); font-size: .73rem; }
+
+    /* Price */
+    .pricing { background: var(--sage); }
+    .price-layout { display: grid; grid-template-columns: 1.1fr .9fr; gap: 45px; align-items: center; }
+    .price-card { background: var(--paper); padding: 34px; border-radius: var(--radius-lg); box-shadow: var(--shadow); }
+    .price-card .tag { display: inline-flex; padding: 6px 10px; border-radius: 999px; background: var(--sun); color: var(--forest-deep); font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
+    .price { display: flex; align-items: baseline; gap: 9px; margin: 20px 0 5px; }
+    .price strong { font-family: 'Playfair Display', Georgia, serif; font-size: 4.3rem; line-height: 1; letter-spacing: -.06em; }
+    .price span { color: var(--muted); font-size: .82rem; }
+    .price-caption { color: var(--muted); font-size: .82rem; }
+    .include-list { list-style: none; margin: 25px 0; padding: 0; display: grid; gap: 12px; }
+    .include-list li { display: flex; gap: 10px; font-size: .88rem; }
+    .include-list svg { flex: 0 0 auto; margin-top: 3px; width: 16px; height: 16px; color: var(--pine); }
+    .price-card .btn { width: 100%; }
+    .price-details h3 { font-family: 'DM Sans', sans-serif; font-size: 1rem; margin-bottom: 20px; }
+    .price-details p { color: var(--muted); font-size: .9rem; }
+    .price-details .rule { height: 1px; background: rgba(45,99,80,.2); margin: 22px 0; }
+    .price-details strong { color: var(--forest); }
+
+    /* CTA */
+    .cta { padding: 105px 0 125px; background: var(--forest-deep); color: #fff; text-align: center; position: relative; overflow: hidden; }
+    .cta::before { content: ''; position: absolute; width: 440px; height: 440px; left: -170px; top: -170px; border: 1px solid rgba(185,212,190,.12); border-radius: 50%; box-shadow: 0 0 0 38px rgba(185,212,190,.04), 0 0 0 76px rgba(185,212,190,.03); }
+    .cta .wrap { position: relative; z-index: 1; }
+    .cta h2 { max-width: 690px; margin: 15px auto; }
+    .cta p { max-width: 570px; margin: 0 auto 28px; color: #b6c9be; }
+    .booking-form { display: flex; max-width: 510px; margin: 0 auto; padding: 5px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); border-radius: 999px; }
+    .booking-form input { flex: 1; min-width: 0; padding: 11px 17px; border: 0; outline: 0; color: #fff; background: transparent; }
+    .booking-form input::placeholder { color: rgba(255,255,255,.57); }
+    .booking-form .btn { white-space: nowrap; padding: 11px 17px; }
+    .form-message { min-height: 1.4em; margin-top: 12px; color: #d8e9cc; font-size: .82rem; }
+
+    /* Footer */
+    footer { padding: 30px 0 42px; background: var(--forest-deep); color: #87a99a; border-top: 1px solid rgba(255,255,255,.08); font-size: .76rem; }
+    .footer-inner { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    footer a { text-decoration: underline; text-underline-offset: 3px; }
+    footer a:hover { color: #fff; }
+
+    @media (max-width: 900px) {
+      .hero { min-height: 700px; }
+      .hero-card { position: static; margin-top: 40px; width: fit-content; }
+      .hero-note { margin-top: 34px; }
+      .split, .map-layout, .price-layout { grid-template-columns: 1fr; gap: 38px; }
+      .map-copy { padding: 0; }
+      #map, .map-fallback { min-height: 460px; }
+      .timeline { gap: 35px; }
+    }
+    @media (max-width: 680px) {
+      .wrap { width: min(100% - 28px, 560px); }
+      .nav-links { display: none; }
+      .nav { padding: 17px 0; }
+      .hero { min-height: 730px; }
+      .hero-inner { padding-top: 115px; }
+      .hero h1 { font-size: clamp(3.1rem, 16vw, 5rem); }
+      .facts-grid { grid-template-columns: repeat(2, 1fr); }
+      .fact { padding: 18px 16px; }
+      .fact:nth-child(2) { border-right: 0; }
+      .fact:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .section { padding: 80px 0; }
+      .day-grid, .timeline, .pillars { grid-template-columns: 1fr; }
+      .day-card { min-height: 390px; }
+      .timeline-wrap { padding: 55px 21px; }
+      .time-row { grid-template-columns: 62px 1fr; gap: 14px; }
+      .time { width: 62px; font-size: .71rem; }
+      .timeline-day::before { left: 38px; }
+      .price-card { padding: 25px; }
+      .price strong { font-size: 3.6rem; }
+      .booking-form { border-radius: 17px; flex-direction: column; padding: 8px; }
+      .booking-form input { padding: 12px 13px; }
+      .booking-form .btn { width: 100%; }
+      .footer-inner { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="Ostia Unplugged home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19.5 4.5C13 4.6 7.3 6.4 6.1 11.1c-.7 2.9 1.2 5 4.4 4.8 4.8-.3 7.8-4.8 9-11.4Z"/><path d="M4 20c2.6-4.1 6.2-6.4 11.1-7.2"/></svg>
+        </span>
+        <span>Ostia Unplugged</span>
+      </a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#experience">The experience</a>
+        <a href="#itinerary">Itinerary</a>
+        <a href="#map-section">Map</a>
+        <a href="#price">Price</a>
+      </nav>
+      <a class="btn primary" href="#book">Request dates <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <div class="eyebrow light">A two-day guided escape from Rome's coast</div>
+          <h1>Walk out of Rome. Arrive somewhere else.</h1>
+          <p class="hero-lede">A slow weekend through pine-scented trails, ancient harbour ruins and the easygoing food culture of Lido di Ostia. No rush. No screens. Just a local story at every stop.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#itinerary">Explore the weekend <span aria-hidden="true">↓</span></a>
+            <a class="btn ghost" href="#book">Hold my place</a>
+          </div>
+          <div class="hero-note">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.7 2.7L16.5 9"/></svg>Pet-friendly by design</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/><circle cx="12" cy="12" r="9"/></svg>Small-group, local-led</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3v8M3 3v8a3 3 0 0 0 6 0V3M6 14v7M18 3v18M18 3c-2.2 2.2-3.2 4.4-3.2 6.2 0 2.2 1.4 3.8 3.2 3.8"/></svg>Easy by public transport</span>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="eyebrow light">Next departures</div>
+          <strong>Saturday + Sunday</strong>
+          <small>Spring and summer dates · from EUR Fermi Metro B</small>
+        </div>
+        <div class="leaf-stamp" aria-hidden="true"><svg viewBox="0 0 200 200" fill="none" stroke="white" stroke-width="1"><circle cx="100" cy="100" r="75" stroke-dasharray="3 7"/><path d="M147 53c-38 3-66 18-70 45-3 21 11 35 33 31 31-5 46-35 52-76Z"/><path d="M43 161c23-41 51-59 88-66"/></svg></div>
+      </div>
+    </section>
+
+    <section class="facts" aria-label="Trip facts">
+      <div class="wrap facts-grid">
+        <div class="fact"><div class="fact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></svg></div><strong>2 days / 1 night</strong><span>Saturday to Sunday</span></div>
+        <div class="fact"><div class="fact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V7l8-3 8 3v12M8 19v-5h8v5M2 19h20"/></svg></div><strong>Nature + history</strong><span>Pines, ruins and the sea</span></div>
+        <div class="fact"><div class="fact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6.5C6 4.6 7.6 3 9.5 3S13 4.6 13 6.5 11.4 10 9.5 10 6 8.4 6 6.5ZM13 14c0-1.7 1.3-3 3-3s3 1.3 3 3-1.3 3-3 3-3-1.3-3-3ZM2.5 19c.5-3 2.8-5 6-5s5.5 2 6 5M14 21c.2-1.4 1-2.5 2-3"/></svg></div><strong>Dogs welcome</strong><span>Leash on, adventure on</span></div>
+        <div class="fact"><div class="fact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/><circle cx="12" cy="12" r="9"/></svg></div><strong>From €249 pp</strong><span>Double-room estimate</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="experience">
+      <div class="wrap split">
+        <div class="section-head">
+          <div class="eyebrow">The weekend at a glance</div>
+          <h2>Three moods.<br>One easy rhythm.</h2>
+          <p>Trade the city rush for a local-paced weekend where every transfer becomes part of the story. Your guide stays with you from Metro B to the last dinner.</p>
+          <p class="script-quote">“A pocket of Mediterranean life hiding in plain sight.”</p>
+        </div>
+        <div class="pillars">
+          <article class="pillar"><div class="num">01 / BREATHE</div><h3>Walk the pine forest</h3><p>Follow the Via Severiana through Castel Fusano and listen for the wildlife between the umbrella pines.</p></article>
+          <article class="pillar"><div class="num">02 / REMEMBER</div><h3>Read the Roman coast</h3><p>Step from the ancient salt pans to Ostia's forum, baths, warehouses and imperial harbours.</p></article>
+          <article class="pillar"><div class="num">03 / TASTE</div><h3>Eat where locals eat</h3><p>Begin with cappuccino and cornetto, then finish with Roman classics and organic coastal cooking.</p></article>
+          <article class="pillar"><div class="num">04 / BELONG</div><h3>Travel lightly</h3><p>Public transport, local businesses and a small group keep the footprint gentle and the welcome warm.</p></article>
+        </div>
+      </div>
+      <div class="wrap day-grid">
+        <article class="day-card day1"><div class="day-card-content"><div class="day-label">Day 01 · Nature + art</div><h3>Green trails, good food, open air.</h3><p>Castel Porziano, the Pineta, Chigi Castle and a sunset by the Fishermen's Channel.</p><div class="mini-list"><span>Forest walk</span><span>Castle visit</span><span>Seafood option</span></div></div></article>
+        <article class="day-card day2"><div class="day-card-content"><div class="day-label">Day 02 · Rediscover history</div><h3>Ancient Ostia, still alive.</h3><p>Roman streets, the harbour system and an organic dinner in the Park of the Pond Channel.</p><div class="mini-list"><span>Archaeological park</span><span>Imperial harbours</span><span>Local dinner</span></div></div></article>
+      </div>
+    </section>
+
+    <section class="section tight" id="itinerary">
+      <div class="wrap">
+        <div class="timeline-wrap">
+          <div class="section-head"><div class="eyebrow light">Your two-day story</div><h2>From first coffee<br>to final toast.</h2><p>Times are a relaxed working plan; your guide adapts the pace to the group, weather and opening hours.</p></div>
+          <div class="timeline">
+            <div class="timeline-day">
+              <h3>Day 01 / Nature + art</h3>
+              <div class="time-row"><div class="time">09:00</div><div><h4>Meet at EUR Fermi</h4><p>Metro B · meet your guide and begin the ride towards Castel Porziano.</p></div></div>
+              <div class="time-row"><div class="time">09:40</div><div><h4>Ohana Bar Bistrot</h4><p>Cappuccino + cornetto at a community-minded local social hub.</p></div></div>
+              <div class="time-row"><div class="time">10:15</div><div><h4>Pineta di Castel Fusano</h4><p>Slow walk, local flora and fauna, plus a stretch of ancient Via Severiana.</p></div></div>
+              <div class="time-row"><div class="time">13:00</div><div><h4>Chigi Castle picnic</h4><p>Bring your packed lunch and settle into the green area beside the castle.</p></div></div>
+              <div class="time-row"><div class="time">14:30</div><div><h4>Inside Castel Fusano</h4><p>17th-century fortress and Pietro da Cortona interiors · indicative entry €25.</p></div></div>
+              <div class="time-row"><div class="time">16:00</div><div><h4>Fishermen's Channel</h4><p>Cross the Canale dei Pescatori and discover the Borghetto dei Pescatori.</p></div></div>
+              <div class="time-row"><div class="time">16:30</div><div><h4>Your afternoon choice</h4><p>Animal Farm (from €8) or Be Wild Park (from €10), both family-friendly.</p></div></div>
+              <div class="time-row"><div class="time">19:00</div><div><h4>Roman dinner at Il Frantoio</h4><p>Meat or fish menu, local wine and a table near the pine forest.</p></div></div>
+              <div class="time-row"><div class="time">21:00</div><div><h4>Check in</h4><p>Ostia Antica Park Hotel &amp; Spa · your base for the night.</p></div></div>
+            </div>
+            <div class="timeline-day">
+              <h3>Day 02 / Rediscovering history</h3>
+              <div class="time-row"><div class="time">10:00</div><div><h4>Breakfast at the hotel</h4><p>Take the bus to Romagnoli / Scavi Ostia Antica.</p></div></div>
+              <div class="time-row"><div class="time">11:00</div><div><h4>Archaeological Park of Ostia Antica</h4><p>Forum, baths, horrea, Capitolium and museum · full ticket €18.</p></div></div>
+              <div class="time-row"><div class="time">13:00</div><div><h4>Arianna al Borghetto</h4><p>Roman comfort food a few steps from the archaeological site.</p></div></div>
+              <div class="time-row"><div class="time">15:00</div><div><h4>Julius II Castle + Ostia Antica hamlet</h4><p>Then continue to the Sacred Island, the Roman ships and the imperial ports.</p></div></div>
+              <div class="time-row"><div class="time">19:00</div><div><h4>Zenzero Biorestaurant</h4><p>Organic, locally sourced cooking in the Park of the Pond Channel.</p></div></div>
+              <div class="timeline-note"><strong>Summer edition:</strong> from 21–30 August, swap the afternoon choice for the Sagra della Tellina at the Fishermen's District, with seafood tasting and the Stella Maris procession.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="map-section">
+      <div class="wrap">
+        <div class="section-head"><div class="eyebrow">Follow the thread</div><h2>Every stop, on one map.</h2><p>Pin the whole loop from EUR to the coast and Ostia Antica. Choose a day, then tap a stop to focus on it.</p></div>
+        <div class="map-layout">
+          <div class="map-copy">
+            <div class="map-filters" role="group" aria-label="Filter map by day"><button class="filter active" data-filter="all">All stops</button><button class="filter" data-filter="1">Day 1</button><button class="filter" data-filter="2">Day 2</button></div>
+            <div class="map-legend"><span class="legend-item"><i class="legend-dot d1"></i>Day 1</span><span class="legend-item"><i class="legend-dot d2"></i>Day 2</span></div>
+            <div class="stop-list" id="stopList" aria-live="polite"></div>
+            <small class="map-note">Map pins are indicative for itinerary planning. Confirm exact access points, transport changes and seasonal opening hours before travel.</small>
+          </div>
+          <div id="map" aria-label="Interactive map of Ostia itinerary"></div>
+          <div class="map-fallback" id="mapFallback" aria-hidden="true"><div class="fallback-sea"></div><div class="fallback-route"></div><div class="fallback-pin d1" style="left:15%;top:19%"></div><div class="fallback-label" style="left:11%;top:12%">EUR Fermi</div><div class="fallback-pin d1" style="left:43%;top:30%"></div><div class="fallback-label" style="left:36%;top:34%">Pineta</div><div class="fallback-pin d1" style="left:57%;top:51%"></div><div class="fallback-label" style="left:52%;top:55%">Borghetto</div><div class="fallback-pin d1" style="left:72%;top:59%"></div><div class="fallback-label" style="left:66%;top:63%">Ostia hotel</div><div class="fallback-pin d2" style="left:62%;top:71%"></div><div class="fallback-label" style="left:46%;top:75%">Ostia Antica</div><div class="fallback-pin d2" style="left:79%;top:81%"></div><div class="fallback-label" style="left:66%;top:85%">Zenzero</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section pricing" id="price">
+      <div class="wrap price-layout">
+        <div class="section-head"><div class="eyebrow">A fair, simple starting point</div><h2>Two days that feel like a real break.</h2><p>The recommended launch price balances a hosted experience, one comfortable night and the key admissions — while keeping meals and optional activities flexible.</p><p class="script-quote">From €249 per person, based on two people sharing a double room.</p></div>
+        <div class="price-card">
+          <span class="tag">Recommended package</span>
+          <div class="price"><strong>€249</strong><span>/ person</span></div>
+          <div class="price-caption">Indicative price · Saturday–Sunday · spring / summer</div>
+          <ul class="include-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Local guide throughout the itinerary</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>1 night at Ostia Antica Park Hotel &amp; Spa</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Ostia Antica Archaeological Park ticket</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Chigi Castle visit (indicative)</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Route plan + public-transport coordination</li>
+          </ul>
+          <a href="#book" class="btn dark">Ask for available dates <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+      <div class="wrap" style="margin-top:35px"><div class="price-details"><h3>Good to know</h3><p><strong>Not included:</strong> packed lunch on Day 1, restaurant bills, Animal Farm / Be Wild Park add-ons and personal purchases. This keeps the weekend flexible for families, backpackers and dog parents.</p><div class="rule"></div><p><strong>Pricing note:</strong> €249 is a launch recommendation, not a live quote. Confirm hotel availability, guide capacity, admissions and seasonal event dates before taking payment.</p></div></div>
+    </section>
+
+    <section class="cta" id="book">
+      <div class="wrap"><div class="eyebrow light">Ready when you are</div><h2>Leave the notifications.<br>Keep the memories.</h2><p>Tell us your preferred weekend and group size. We will come back with availability, a final quote and the best Day 1 option for your group.</p><form class="booking-form" id="bookingForm"><input type="email" id="email" required placeholder="Your email address" aria-label="Your email address"><button class="btn primary" type="submit">Request dates <span aria-hidden="true">↗</span></button></form><div class="form-message" id="formMessage" role="status"></div></div>
+    </section>
+  </main>
+
+  <footer><div class="wrap footer-inner"><span>© 2026 Ostia Unplugged · A slow-travel concept for Lido di Ostia</span><span><a href="https://www.ostiaantica.beniculturali.it/en/opening-hours-tickets/" target="_blank" rel="noreferrer">Check official park information</a> · <a href="https://commons.wikimedia.org/wiki/File:Castelfusano_(Parco_urbano_Pineta_di_Castel_Fusano)_-_Rome,_Italy_2024-03-04.jpg" target="_blank" rel="noreferrer">Day 1 photo: Ryan Hodnett / Wikimedia Commons</a> · <a href="https://commons.wikimedia.org/wiki/File:Ostia_theater_exterior.jpg" target="_blank" rel="noreferrer">Day 2 photo: Wikimedia Commons</a> · <a href="#map-section">Open route map</a></span></div></footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    const stops = [
+      {day: 1, time: '09:00', name: 'EUR Fermi Metro Station', place: 'Meet point · Metro B', coords: [41.8314, 12.4692], query: 'EUR Fermi Metro Station Rome'},
+      {day: 1, time: '09:40', name: 'Ohana Bar Bistrot', place: 'Via del Martin Pescatore, 4', coords: [41.7422, 12.3662], query: 'Ohana Bar Bistrot Via del Martin Pescatore 4'},
+      {day: 1, time: '10:15', name: 'Pineta di Castel Fusano', place: 'Pine Forest · Via Severiana', coords: [41.7387, 12.3044], query: 'Pineta di Castel Fusano'},
+      {day: 1, time: '13:00', name: 'Chigi Castle / Castel Fusano', place: 'Viale Mediterraneo, 52', coords: [41.7335, 12.3109], query: 'Castello Chigi Viale Mediterraneo 52'},
+      {day: 1, time: '16:00', name: "Fishermen's Channel", place: 'Canale dei Pescatori', coords: [41.7348, 12.2980], query: 'Canale dei Pescatori Ostia'},
+      {day: 1, time: '16:10', name: 'Borghetto dei Pescatori', place: 'Fishermen’s District', coords: [41.7330, 12.2960], query: 'Borghetto dei Pescatori Ostia'},
+      {day: 1, time: '16:30', name: 'Animal Farm / Be Wild Park', place: 'Optional afternoon activity', coords: [41.7289, 12.3127], query: 'Animal Farm Ostia Be Wild Park'},
+      {day: 1, time: '19:00', name: 'Il Frantoio', place: 'Via Castel Fusano, 23/A', coords: [41.7587, 12.3016], query: 'Il Frantoio Via Castel Fusano 23 Ostia'},
+      {day: 1, time: '21:00', name: 'Ostia Antica Park Hotel & Spa', place: 'Viale dei Romagnoli, 1041/A', coords: [41.7674, 12.3058], query: 'Ostia Antica Park Hotel Spa'},
+      {day: 2, time: '11:00', name: 'Archaeological Park of Ostia Antica', place: 'Romagnoli / Scavi Ostia Antica', coords: [41.7567, 12.2968], query: 'Archaeological Park of Ostia Antica'},
+      {day: 2, time: '13:00', name: 'Arianna al Borghetto', place: 'Via del Forno, 11', coords: [41.7562, 12.2962], query: 'Arianna al Borghetto Via del Forno 11'},
+      {day: 2, time: '15:00', name: 'Julius II Castle + Ostia Antica Hamlet', place: 'Borgo di Ostia Antica', coords: [41.7560, 12.2966], query: 'Castle of Julius II Ostia Antica'},
+      {day: 2, time: '16:30', name: 'Portus Necropolis · Isola Sacra', place: 'Sacred Island', coords: [41.7699, 12.2726], query: 'Necropolis of Portus Isola Sacra'},
+      {day: 2, time: '17:00', name: 'Museum of the Roman Ships', place: 'Fiumicino', coords: [41.7727, 12.2791], query: 'Museum of the Roman Ships Fiumicino'},
+      {day: 2, time: '17:30', name: 'Imperial Harbours of Claudius & Trajan', place: 'Porti Imperiali', coords: [41.7734, 12.2780], query: 'Imperial Harbours of Claudius and Trajan'},
+      {day: 2, time: '19:00', name: 'Zenzero Biorestaurant', place: 'Via Mar dei Sargassi, 68', coords: [41.7233, 12.2965], query: 'Zenzero Biorestaurant Via Mar dei Sargassi 68'}
+    ];
+    let activeFilter = 'all';
+    let map;
+    let markerLayer;
+    const markers = new Map();
+    const route1 = [[41.8314,12.4692],[41.7422,12.3662],[41.7387,12.3044],[41.7335,12.3109],[41.7348,12.2980],[41.7289,12.3127],[41.7587,12.3016],[41.7674,12.3058]];
+    const route2 = [[41.7674,12.3058],[41.7567,12.2968],[41.7562,12.2962],[41.7560,12.2966],[41.7699,12.2726],[41.7727,12.2791],[41.7734,12.2780],[41.7233,12.2965]];
+    const listEl = document.getElementById('stopList');
+
+    function googleLink(query) { return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query); }
+    function renderStopList() {
+      const visible = stops.filter(s => activeFilter === 'all' || String(s.day) === activeFilter);
+      listEl.innerHTML = visible.map((s, i) => `<div class="stop-item" data-index="${stops.indexOf(s)}"><span class="stop-time">${s.time}</span><span class="stop-name">${s.name}<small class="stop-place">${s.place}</small></span><span class="arrow" aria-hidden="true">↗</span></div>`).join('');
+      listEl.querySelectorAll('.stop-item').forEach(item => item.addEventListener('click', () => focusStop(Number(item.dataset.index))));
+    }
+    function popup(s) { return `<div class="popup-title">${s.name}</div><div class="popup-meta">${s.place} · Day ${s.day} · ${s.time}</div><a class="popup-link" href="${googleLink(s.query)}" target="_blank" rel="noreferrer">Open in Google Maps ↗</a>`; }
+    function focusStop(index) {
+      const s = stops[index];
+      if (map && markers.has(index)) { map.setView(s.coords, 14, {animate: true}); markers.get(index).openPopup(); }
+    }
+    function markerIcon(day) { return L.divIcon({className:'', html:`<div class="marker d${day}"><span></span></div>`, iconSize:[25,25], iconAnchor:[12,25], popupAnchor:[0,-24]}); }
+    function renderMap() {
+      const visible = stops.map((s,i) => ({s,i})).filter(({s}) => activeFilter === 'all' || String(s.day) === activeFilter);
+      if (!map) { renderStopList(); return; }
+      markerLayer.clearLayers(); markers.clear();
+      visible.forEach(({s,i}) => { const m = L.marker(s.coords, {icon: markerIcon(s.day)}).bindPopup(popup(s)); m.addTo(markerLayer); markers.set(i,m); });
+      if (activeFilter === 'all') {
+        L.polyline(route1, {color:'#df805d', weight:3, opacity:.7, dashArray:'6 8'}).addTo(markerLayer);
+        L.polyline(route2, {color:'#2d6350', weight:3, opacity:.75, dashArray:'6 8'}).addTo(markerLayer);
+      } else {
+        L.polyline(activeFilter === '1' ? route1 : route2, {color: activeFilter === '1' ? '#df805d' : '#2d6350', weight:4, opacity:.75, dashArray:'7 8'}).addTo(markerLayer);
+      }
+      renderStopList();
+    }
+    function initMap() {
+      if (typeof L === 'undefined') { document.getElementById('map').style.display = 'none'; document.getElementById('mapFallback').style.display = 'block'; renderStopList(); return; }
+      map = L.map('map', {scrollWheelZoom:false, zoomControl:true}).setView([41.751, 12.316], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 18, attribution:'© OpenStreetMap contributors'}).addTo(map);
+      markerLayer = L.layerGroup().addTo(map);
+      renderMap();
+    }
+    document.querySelectorAll('.filter').forEach(btn => btn.addEventListener('click', () => { activeFilter = btn.dataset.filter; document.querySelectorAll('.filter').forEach(b => b.classList.toggle('active', b === btn)); renderMap(); }));
+    document.getElementById('bookingForm').addEventListener('submit', (event) => { event.preventDefault(); const email = document.getElementById('email').value; document.getElementById('formMessage').textContent = `Thanks — we’ll send the next available dates to ${email}.`; event.target.reset(); });
+    initMap();
+  </script>
+</body>
+</html>
